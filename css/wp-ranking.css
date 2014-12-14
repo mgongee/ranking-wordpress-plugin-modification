@@ -1,0 +1,45 @@
+.rankings th  {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rankings td {
+	text-align: center;
+}
+
+.rankings .avatar {
+  margin: 0 auto;
+   float: none;
+      display:block;
+}
+
+.rankings .player {
+	text-align: left;
+}
+
+.rankings .position {
+	text-align: center;
+}
+
+.rankings .author {
+	cursor: pointer;
+    vertical-align: bottom;
+    text-align:center;
+}
+
+.author-comment {
+    background-color: #EEE;
+    padding: 10px 10px 40px;
+    margin-top: 5px;
+}
+
+.author-comment .avatar {
+    display: block;
+    border-radius: 50%;
+    float: right;
+    margin: 0px 20px 20px 0px;
+}
+
+.ranked-user {
+	padding: 3px;
+}
