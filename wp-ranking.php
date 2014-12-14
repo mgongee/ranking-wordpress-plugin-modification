@@ -121,9 +121,10 @@ register_taxonomy_for_object_type( 'list_category', 'player_list' );
 // Hook into the 'init' action
 add_action( 'init', 'list_category', 0 );
 }
-// Adding a shortocde [ranker id="id"]
+// Adding a shortocde [ranker id="id" show_composite="0"]
 function ranker_shortcode( $atts ) {
 	$id = $atts['id']; // Get ranker id
+	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : false ; // settings for composite
 	$rankings = get_post_meta($id, '_rankings'); // Get rankings
 	$rankings = $rankings[0];
 	foreach ($rankings as $author => $ranking) {
@@ -168,13 +169,13 @@ function ranker_shortcode( $atts ) {
 	echo '<tr>';
 	echo '<th></th>';
 
-	if ($rankings_count > 1 AND $composite_position == 'left') {
+	if ($rankings_count > 1 AND $composite_position == 'left' AND $show_composite) {
 		show_composite_rankings_header();
 	}
 
 	show_ranked_authors($rankings, $current_user, $limit_users);
 
-	if ($rankings_count > 1 AND ($composite_position == 'right' OR $composite_position === false)) {
+	if ($rankings_count > 1 AND $show_composite AND ($composite_position == 'right' OR $composite_position === false)) {
 		show_composite_rankings_header();
 	}
 	echo '</tr>';
@@ -205,7 +206,7 @@ function ranker_shortcode( $atts ) {
 			$row['total'] = $total;
 			$row['votes'] = $votes;
 			$row['composite'] = 0;
-			if ($votes != 0) {
+			if ($votes != 0 AND $show_composite) {
 				$row['composite'] = get_composite_rankings($total, $votes);
 			}
 			
@@ -219,7 +220,7 @@ function ranker_shortcode( $atts ) {
 
 	}
 
-	usort($table, "sort_by_composite");
+	//usort($table, "sort_by_composite");
 
 	$row_counter = 1;
 	foreach ($table as $row) {
@@ -236,7 +237,7 @@ function ranker_shortcode( $atts ) {
 				$output .= $row['player-name'];
 				$output .= '</td>';
 
-				if ($rankings_count > 1 AND $composite_position == 'left') {
+				if ($rankings_count > 1 AND $show_composite AND $composite_position == 'left') {
 					$output .= '<td>';
 						$output .= $row_counter;
 					$output .= '</td>';
@@ -261,7 +262,7 @@ function ranker_shortcode( $atts ) {
 						}
 					}	
 				}
-				if ($rankings_count > 1 AND $composite_position == 'right') {
+				if ($rankings_count > 1 AND $show_composite AND $composite_position == 'right') {
 					$output .= '<td>';
 						$output .= $row_counter;
 					$output .= '</td>';
@@ -323,6 +324,8 @@ function show_author_thumbnail($user_id) {
 	$user_info = get_userdata($user_id);
 	echo '<br>';
 	echo '<span class="ranked-user">' . $user_info->display_name . '</span>';
+	echo '<br>';
+	echo '<i>timestamp</i>';
 	echo '</th>';
 }
 
