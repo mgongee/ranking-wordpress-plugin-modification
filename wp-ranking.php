@@ -125,6 +125,9 @@ add_action( 'init', 'list_category', 0 );
 function ranker_shortcode( $atts ) {
 	$id = $atts['id']; // Get ranker id
 	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : current_user_can('moderate_comments') ; // settings for composite
+	
+	$target_user = isset($atts['user_id']) ? $atts['user_id'] : false ; // Get user id
+	
 	$rankings = get_post_meta($id, '_rankings'); // Get rankings
 	$rankings = $rankings[0];
 	foreach ($rankings as $author => $ranking) {
@@ -170,13 +173,13 @@ function ranker_shortcode( $atts ) {
 	echo '<th colspan="3"></th>';
 
 	
-	if ($rankings_count > 1 AND $composite_position == 'left' AND $show_composite) {
+	if ($rankings_count > 1 AND $composite_position == 'left' AND $show_composite AND !$target_user) {
 		show_composite_rankings_header();
 	}
 
-	show_ranked_authors($rankings, $current_user, $limit_users);
+	show_ranked_authors($rankings, $current_user, $limit_users, $target_user);
 
-	if ($rankings_count > 1 AND $show_composite AND ($composite_position == 'right' OR $composite_position === false)) {
+	if ($rankings_count > 1 AND $show_composite AND !$target_user AND ($composite_position == 'right' OR $composite_position === false)) {
 		show_composite_rankings_header();
 	}
 	echo '</tr>';
@@ -246,32 +249,41 @@ function ranker_shortcode( $atts ) {
 				$output .= $row['player-position']; // position
 				$output .= '</td>';
 
-				if ($rankings_count > 1 AND $show_composite AND $composite_position == 'left') {
+				if ($rankings_count > 1 AND $show_composite AND !$target_user AND $composite_position == 'left') {
 					$output .= '<td>';
 						$output .= $row_counter;
 					$output .= '</td>';
 				}
 
 				$counter = 0;
+				if ($target_user) {
 
-				if ($current_user != 0 AND isset($rankings[$current_user])) {
-					$output .= '<td class="position">';
-					$output .= $row['positions'][$current_user];
+					$output .= '<td>';
+					$output .= $row['positions'][$target_user];
 					$output .= '</td>';
-					$counter++;
+					$counter++;	
 				}
+				else {
+					if ($current_user != 0 AND isset($rankings[$current_user])) {
+						$output .= '<td class="position">';
+						$output .= $row['positions'][$current_user];
+						$output .= '</td>';
+						$counter++;
+					}
 
-				foreach ($row['positions'] as $author => $position) {
-					if ($counter < $limit_users OR $limit_users == 0) {
-						if ($author != $current_user) {
-							$output .= '<td>';
-							$output .= $position;
-							$output .= '</td>';
-							$counter++;	
-						}
-					}	
+					foreach ($row['positions'] as $author => $position) {
+						if ($counter < $limit_users OR $limit_users == 0) {
+							if ($author != $current_user) {
+								$output .= '<td>';
+								$output .= $position;
+								$output .= '</td>';
+								$counter++;	
+							}
+						}	
+					}
 				}
-				if ($rankings_count > 1 AND $show_composite AND $composite_position == 'right') {
+				
+				if ($rankings_count > 1 AND $show_composite AND !$target_user AND $composite_position == 'right') {
 					$output .= '<td>';
 						$output .= $row_counter;
 					$output .= '</td>';
@@ -312,26 +324,32 @@ function ranker_shortcode( $atts ) {
 }
 add_shortcode( 'ranker', 'ranker_shortcode' );
 
-function show_ranked_authors($rankings, $current_user, $limit_users) {
+function show_ranked_authors($rankings, $current_user, $limit_users, $target_user = false) {
 	$counter = 0;
-	if ($current_user != 0 AND isset($rankings[$current_user])) {
-		show_author_thumbnail($current_user, $rankings[$current_user]);
-		$counter++;
+	if ($target_user) {
+		if (isset($rankings[$target_user]))
+			show_author_thumbnail($target_user, $rankings[$target_user]['time']);
 	}
-	foreach ($rankings as $author => $data) {
-
-		if (($limit_users == '0' OR $counter < $limit_users) AND $author != $current_user) {
-			show_author_thumbnail($author, $data);	
+	else {
+		if ($current_user != 0 AND isset($rankings[$current_user])) {
+			show_author_thumbnail($current_user, $rankings[$current_user]['time']);
 			$counter++;
+		}
+		foreach ($rankings as $author => $data) {
+
+			if (($limit_users == '0' OR $counter < $limit_users) AND $author != $current_user) {
+				show_author_thumbnail($author, $data['time']);	
+				$counter++;
+			}
 		}
 	}
 }
 
-function show_author_thumbnail($user_id, $user_ranking) {
+function show_author_thumbnail($user_id, $user_ranking_time) {
 	echo '<th class="author" title="' . __( 'Click to sort by this author', 'wp-ranking' ) . '">';
 	if (get_option( 'show-avatars' )) echo get_avatar( $user_id, 60 );
 	$user_info = get_userdata($user_id);
-	$timestamp = date("M d, H:i", $user_ranking['time']);
+	$timestamp = date("M d, H:i", $user_ranking_time);
 	echo '<br>';
 	echo '<span class="ranked-user">' . $user_info->display_name . '</span>';
 	echo '<br>';
