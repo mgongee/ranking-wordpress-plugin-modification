@@ -124,7 +124,7 @@ add_action( 'init', 'list_category', 0 );
 // Adding a shortocde [ranker id="id" show_composite="0"]
 function ranker_shortcode( $atts ) {
 	$id = $atts['id']; // Get ranker id
-	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : false ; // settings for composite
+	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : current_user_can('moderate_comments') ; // settings for composite
 	$rankings = get_post_meta($id, '_rankings'); // Get rankings
 	$rankings = $rankings[0];
 	foreach ($rankings as $author => $ranking) {
@@ -167,8 +167,9 @@ function ranker_shortcode( $atts ) {
 	echo '<table id="ranker' . $rankers_counter . '" class="rankings">';
 	echo '<thead>';
 	echo '<tr>';
-	echo '<th></th>';
+	echo '<th colspan="3"></th>';
 
+	
 	if ($rankings_count > 1 AND $composite_position == 'left' AND $show_composite) {
 		show_composite_rankings_header();
 	}
@@ -185,7 +186,9 @@ function ranker_shortcode( $atts ) {
 	foreach ($players as $player) {
 			$row = '';
 			$row['player-id'] = $player['id'];
-			$row['player-name'] = get_players_name($player);
+			$row['player-name'] = $player['name'];
+			$row['player-team'] = $player['team'];
+			$row['player-position'] = $player['position'];
 
 			$total = 0;
 			$votes = 0;
@@ -234,7 +237,13 @@ function ranker_shortcode( $atts ) {
 			if ($row['votes'] > 0) {
 	 			$output = '<tr class="' . $class . '" id="player' . $row['player-id'] . '">';
 				$output .= '<td class="player">';
-				$output .= $row['player-name'];
+				$output .= $row['player-name']; // name
+				$output .= '</td>';
+				$output .= '<td class="player">';
+				$output .= $row['player-team']; // team
+				$output .= '</td>';
+				$output .= '<td class="player">';
+				$output .= $row['player-position']; // position
 				$output .= '</td>';
 
 				if ($rankings_count > 1 AND $show_composite AND $composite_position == 'left') {
@@ -336,13 +345,6 @@ function show_composite_rankings_header() {
 
 function get_composite_rankings($total, $rankings_count) {
 	return round($total / $rankings_count * 100);
-}
-
-function get_players_name($player) {
-	$output = $player['name'];
-	if ($player['team'] != '') $output .= ', ' . $player['team'];
-	if ($player['position'] != '') $output .= ', ' . $player['position'];
-	return $output;
 }
 
 function shuffle_assoc($list) { 
