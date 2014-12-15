@@ -43,3 +43,10 @@
 .ranked-user {
 	padding: 3px;
 }
+
+.author span.ranked-timestamp {
+	text-transform: initial;
+	color: gray;
+	font-size: smaller;
+	font-weight: normal;
+}

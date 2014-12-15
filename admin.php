@@ -216,6 +216,7 @@ function rankings() {
         }
         if (isset($_POST['ranking']) && !isset($_POST['reset'])) { //If "Save changes" button was clicked
             $ranking[$current_user->ID] = $_POST['ranking']; // Add data to current rankings
+			$ranking[$current_user->ID]['time'] = time(); // add timestamp
             add_post_meta($ranker->ID, '_rankings', $ranking, true) or
                 update_post_meta($ranker->ID, '_rankings', $ranking); // Save the data
             $ranking = get_post_meta( $ranker->ID, '_rankings', false); // Get cleaned and validated data back

@@ -306,26 +306,27 @@ add_shortcode( 'ranker', 'ranker_shortcode' );
 function show_ranked_authors($rankings, $current_user, $limit_users) {
 	$counter = 0;
 	if ($current_user != 0 AND isset($rankings[$current_user])) {
-		show_author_thumbnail($current_user);
+		show_author_thumbnail($current_user, $rankings[$current_user]);
 		$counter++;
 	}
 	foreach ($rankings as $author => $data) {
 
 		if (($limit_users == '0' OR $counter < $limit_users) AND $author != $current_user) {
-			show_author_thumbnail($author);	
+			show_author_thumbnail($author, $data);	
 			$counter++;
 		}
 	}
 }
 
-function show_author_thumbnail($user_id) {
+function show_author_thumbnail($user_id, $user_ranking) {
 	echo '<th class="author" title="' . __( 'Click to sort by this author', 'wp-ranking' ) . '">';
 	if (get_option( 'show-avatars' )) echo get_avatar( $user_id, 60 );
 	$user_info = get_userdata($user_id);
+	$timestamp = date("M d, H:i", $user_ranking['time']);
 	echo '<br>';
 	echo '<span class="ranked-user">' . $user_info->display_name . '</span>';
 	echo '<br>';
-	echo '<i>timestamp</i>';
+	echo '<span class="ranked-timestamp">' . $timestamp . '</span>';
 	echo '</th>';
 }
 
