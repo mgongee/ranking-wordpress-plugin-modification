@@ -259,7 +259,10 @@ function ranker_shortcode( $atts ) {
 					$link_text = $row['player-position'];
 				}
 				else {
-					$link_text = 'Buy CD';
+					if ($row['player-link']) {
+						$link_text = 'Buy CD';
+					}
+					else $link_text = '';
 				}
 				
 				if ($row['player-image']) {
