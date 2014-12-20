@@ -50,3 +50,8 @@
 	font-size: smaller;
 	font-weight: normal;
 }
+
+.ranking-cover {
+	height: 50px;
+	width: 50px;
+}

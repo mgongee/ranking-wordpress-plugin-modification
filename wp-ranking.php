@@ -264,10 +264,10 @@ function ranker_shortcode( $atts ) {
 				
 				if ($row['player-image']) {
 					if ($row['player-link']) {
-						$output .= '<a href="' . $row['player-link'] . '"><img style="height: 50px; width: 50px " src="' . $row['player-image']. '" /><br>' . $link_text . '</a>'; // link to album
+						$output .= '<a href="' . $row['player-link'] . '"><img class="ranking-cover" src="' . $row['player-image']. '" /><br>' . $link_text . '</a>'; // link to album
 					}
 					else {
-						$output .= '<img style="height: 50px; width: 50px "  src="' . $row['player-image']. '" /><br>' . $link_text;
+						$output .= '<img class="ranking-cover"  src="' . $row['player-image']. '" /><br>' . $link_text;
 					}
 				}
 				else {

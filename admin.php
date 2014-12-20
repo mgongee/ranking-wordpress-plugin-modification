@@ -389,7 +389,7 @@ function wp_ranker_players_custom_box( $post ) {
     $inputs = '<li><input type="hidden" name="wp_ranker_players[' . $i . '][id]" value="'.esc_attr($player['id']).'" />';
 	
 	if ($player['image']) {
-		$inputs .= '<img style="height: 50px; width: 50px " src="' . $player['image']. '" />';
+		$inputs .= '<img class="ranking-cover" src="' . $player['image']. '" />';
 	}
 
 	$inputs .= '<input type="text" placeholder="' . __( 'Default Rank', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][default_rank]" value="'.esc_attr($player['default_rank']).'" size="5" /> '
