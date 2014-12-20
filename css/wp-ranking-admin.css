@@ -21,3 +21,9 @@
 .rankings td {
 	padding: 10px;
 }
+
+
+.ranking-cover {
+	height: 50px;
+	width: 50px;
+}
