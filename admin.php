@@ -103,6 +103,7 @@ function rankings_user_roles_callback() {
     }
 }
 
+
 function comments_user_roles_callback() {
     $setting = get_option( 'comments-user-roles' );
     global $wp_roles;
@@ -222,6 +223,29 @@ function rankings() {
             $ranking = get_post_meta( $ranker->ID, '_rankings', false); // Get cleaned and validated data back
             $ranking = $ranking[0];
         }
+		
+		if (isset($_POST['action']) && $_POST['action'] == 'add_new_player') { // //If "Add new" button was clicked
+			
+			$new_player = $_POST['new_player'];
+			
+			// check if the HTML is allowed
+			if (!rankings_check_user_rights()) {
+				foreach ($new_player as $key => $value) {
+					$new_player[$key] = strip_tags($value); // remove HTML
+				}
+			}
+			
+			$new_player['id']  = rand(1,999999);
+			
+			
+			// add new player into existing players array
+			$players[0][] = $new_player;
+			
+			$save_players = array_values($players['0']);
+			add_post_meta($list->ID, '_players', $save_players, true) or
+				update_post_meta($list->ID, '_players', $save_players);
+		}
+		
         if (!empty($ranking)) {
             if(isset($ranking[$current_user->ID]['data'])) { //If this user ranked player before, get his order of players and overwrite the default $players array
                 foreach ($ranking[$current_user->ID]['data'] as $player) {
@@ -241,9 +265,9 @@ function rankings() {
                 <thead>
                     <tr>
                         <th><?php _e( 'Rank', 'wp-ranking' ); ?></th>
-                        <th><?php _e( 'Name', 'wp-ranking' ); ?></th>
-                        <th><?php _e( 'Team', 'wp-ranking' ); ?></th>
-                        <th><?php _e( 'Position', 'wp-ranking' ); ?></th>
+                        <th><?php _e( 'Song title', 'wp-ranking' ); ?></th>
+                        <th><?php _e( 'Artist', 'wp-ranking' ); ?></th>
+                        <th><?php _e( 'Album', 'wp-ranking' ); ?></th>
                         <th><?php _e( 'Delete', 'wp-ranking' ); ?></th>
                     </tr>
                 </thead>
@@ -286,6 +310,19 @@ function rankings() {
             
             <p><input type="submit" class="button button-primary" value="<?php _e( 'Save Changes', 'wp-ranking' ); ?>"> <input onclick="return confirm('<?php _e( 'This can not be undoe, are you sure?', 'wp-ranking' ); ?>')" type="submit" class="button" name="reset" value="<?php _e( 'Reset to defaults', 'wp-ranking' ); ?>"></p>
             </form>
+		
+				
+			<form action="" method="POST">
+				<input type="hidden" name="action" value="add_new_player" />
+				
+				Add new Song (you can <?php if ( !rankings_check_user_rights() ) { echo ('not');}?> use HTML in fields):
+				<p><input type="text" placeholder="<?php _e( 'Default Rank', 'wp-ranking' ); ?>" name="new_player[default_rank]" value="" size="25" /></p>
+				<p><input type="text" placeholder="<?php _e( 'Song title', 'wp-ranking' ); ?>" name="new_player[name]" value="" size="25" /></p>
+				<p><input type="text" placeholder="<?php _e( 'Artist', 'wp-ranking' ); ?>" name="new_player[team]" value="" size="25" /></p>
+				<p><input type="text" placeholder="<?php _e( 'Album', 'wp-ranking' ); ?>" name="new_player[position]" value="" size="25" /></p>
+			
+				<p><input type="submit" class="button button-primary" value="<?php _e( 'Add Song', 'wp-ranking' ); ?>"></p>
+			</form>
             <script>
             // fix for table sorting 
             jQuery(function() {
@@ -328,13 +365,13 @@ add_action( 'save_post', 'wp_ranker_save_postdata' );
 function wp_ranker_add_custom_boxes() {
     add_meta_box(
         'wp_ranker_sectionid',
-        __( 'Players', 'wp-ranking' ),
+        __( 'Songs', 'wp-ranking' ),
         'wp_ranker_players_custom_box',
         'player_list','normal','high'
     );
     add_meta_box(
         'wp_ranker_sectionid',
-        __( 'Player List', 'wp-ranking' ),
+        __( 'Song List', 'wp-ranking' ),
         'wp_ranker_player_list_custom_box',
         'ranker','normal','high'
     );
@@ -349,21 +386,21 @@ function wp_ranker_players_custom_box( $post ) {
   echo '<ul id="sortable">';
   $i = 0;
   if (!empty($players[0])) foreach ($players[0] as $player) {
-    echo '<li><input type="hidden" name="wp_ranker_players[' . $i . '][id]" value="'.esc_attr($player['id']).'" /><input type="text" placeholder="' . __( 'Default Rank', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][default_rank]" value="'.esc_attr($player['default_rank']).'" size="25" /> <input type="text" placeholder="' . __( 'Name', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][name]" value="'.esc_attr($player['name']).'" size="25" /> <input type="text" placeholder="' . __( 'Team', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][team]" value="'.esc_attr($player['team']).'" size="25" />  <input type="text" placeholder="' . __( 'Position', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][position]" value="'.esc_attr($player['position']).'" size="25" /> <span class="button remove">' . __( 'Remove', 'wp-ranking' ) . '</span> <span class="drag-icon"></span></li>';
+    echo '<li><input type="hidden" name="wp_ranker_players[' . $i . '][id]" value="'.esc_attr($player['id']).'" /><input type="text" placeholder="' . __( 'Default Rank', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][default_rank]" value="'.esc_attr($player['default_rank']).'" size="5" /> <input type="text" placeholder="' . __( 'Song title', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][name]" value="'.esc_attr($player['name']).'" size="25" /> <input type="text" placeholder="' . __( 'Artist', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][team]" value="'.esc_attr($player['team']).'" size="25" />  <input type="text" placeholder="' . __( 'Album', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][position]" value="'.esc_attr($player['position']).'" size="25" /> <span class="button remove">' . __( 'Remove', 'wp-ranking' ) . '</span> <span class="drag-icon"></span></li>';
     $i++;
   }
   echo '</ul>';
-  echo '<p><span class="button add">' . __( 'Add Player', 'wp-ranking' ) . '</span></p>';
+  echo '<p><span class="button add">' . __( 'Add Song', 'wp-ranking' ) . '</span></p>';
   ?>
   <p><span id="upload_file_button" class="button"><?php _e( 'Import from csv file', 'wp-ranking' ); ?></span></p>
-  <p><?php _e( 'You can upload CSV file in a format like <strong>Default rank,Player name,Team,Position</strong> - one player per line.', 'wp-ranking' ); ?></p>
+  <p><?php _e( 'You can upload CSV file in a format like <strong>Default rank,Song title,Artist,Album</strong> - one song per line.', 'wp-ranking' ); ?></p>
   <p><a href="<?php echo plugins_url('/example.csv', __FILE__); ?>"><?php _e( 'Download the example file', 'wp-ranking' ); ?></a>.</p>
   <script>
   jQuery(function() {
     jQuery( "#sortable" ).sortable({ handle: ".drag-icon" });
     jQuery('.add').live('click', function() {
         var rand = Math.floor((Math.random()*999999)+1);
-        jQuery( "#sortable" ).append('<li><input type="hidden" name="wp_ranker_players[' + rand + '][id]" value="' + rand + '" /><input type="text" placeholder="<?php _e( 'Default Rank', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][default_rank]" value="" size="25" /> <input type="text" placeholder="<?php _e( 'Name', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][name]" value="" size="25" /> <input type="text" placeholder="<?php _e( 'Team', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][team]" value="" size="25" />  <input type="text" placeholder="<?php _e( 'Position', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][position]" value="" size="25" /> <span class="button remove"><?php _e( 'Remove', 'wp-ranking' ); ?></span> <span class="drag-icon"></span></li>');
+        jQuery( "#sortable" ).append('<li><input type="hidden" name="wp_ranker_players[' + rand + '][id]" value="' + rand + '" /><input type="text" placeholder="<?php _e( 'Default Rank', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][default_rank]" value="" size="5" /> <input type="text" placeholder="<?php _e( 'Song title', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][name]" value="" size="25" /> <input type="text" placeholder="<?php _e( 'Artist', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][team]" value="" size="25" />  <input type="text" placeholder="<?php _e( 'Album', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][position]" value="" size="25" /> <span class="button remove"><?php _e( 'Remove', 'wp-ranking' ); ?></span> <span class="drag-icon"></span></li>');
      });
     jQuery('.remove').live('click', function() {
        jQuery(this).parent().remove();
@@ -450,7 +487,7 @@ function change_columns( $cols ) {
     $cols = array(
         'cb'       => '<input type="checkbox" />',
         'title'      => __( 'Title', 'wp-ranking' ),
-        'list' => __( 'Player List', 'wp-ranking' ),
+        'list' => __( 'Song List', 'wp-ranking' ),
         'shortcode' => __( 'Shortcode', 'wp-ranking' ),
         'date'     => __( 'Date', 'wp-ranking' ),
       );

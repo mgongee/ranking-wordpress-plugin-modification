@@ -12,9 +12,9 @@ if ( ! function_exists('wp_ranking_post_types') ) {
 function wp_ranking_post_types() {
 	// Register Lists
 	$labels = array(
-		'name'                => _x( 'Player lists', 'Post Type General Name', 'wp-ranking' ),
-		'singular_name'       => _x( 'Player list', 'Post Type Singular Name', 'wp-ranking' ),
-		'menu_name'           => __( 'Player lists', 'wp-ranking' ),
+		'name'                => _x( 'Song lists', 'Post Type General Name', 'wp-ranking' ),
+		'singular_name'       => _x( 'Song list', 'Post Type Singular Name', 'wp-ranking' ),
+		'menu_name'           => __( 'Song lists', 'wp-ranking' ),
 		'parent_item_colon'   => __( 'Parent list:', 'wp-ranking' ),
 		'all_items'           => __( 'Lists', 'wp-ranking' ),
 		'view_item'           => __( 'View list', 'wp-ranking' ),
@@ -28,7 +28,7 @@ function wp_ranking_post_types() {
 	);
 	$args = array(
 		'label'               => __( 'player_list', 'wp-ranking' ),
-		'description'         => __( 'Player list', 'wp-ranking' ),
+		'description'         => __( 'Song list', 'wp-ranking' ),
 		'labels'              => $labels,
 		'supports'            => array( 'title' ),
 		'taxonomies'          => array( 'list_category' ),
@@ -121,10 +121,16 @@ register_taxonomy_for_object_type( 'list_category', 'player_list' );
 // Hook into the 'init' action
 add_action( 'init', 'list_category', 0 );
 }
+
+
+function rankings_check_user_rights() {
+	return current_user_can( 'edit_pages' );
+}
+
 // Adding a shortocde [ranker id="id" show_composite="0"]
 function ranker_shortcode( $atts ) {
 	$id = $atts['id']; // Get ranker id
-	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : current_user_can('moderate_comments') ; // settings for composite
+	$show_composite = isset($atts['show_composite']) ? $atts['show_composite'] : rankings_check_user_rights() ; // settings for composite
 	
 	$target_user = isset($atts['user_id']) ? $atts['user_id'] : false ; // Get user id
 	
