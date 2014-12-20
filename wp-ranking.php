@@ -198,6 +198,8 @@ function ranker_shortcode( $atts ) {
 			$row['player-name'] = $player['name'];
 			$row['player-team'] = $player['team'];
 			$row['player-position'] = $player['position'];
+			$row['player-link'] = $player['link'];
+			$row['player-image'] = $player['image'];
 
 			$total = 0;
 			$votes = 0;
@@ -252,7 +254,30 @@ function ranker_shortcode( $atts ) {
 				$output .= $row['player-team']; // team
 				$output .= '</td>';
 				$output .= '<td class="player">';
-				$output .= $row['player-position']; // position
+				
+				if ($row['player-position']) {
+					$link_text = $row['player-position'];
+				}
+				else {
+					$link_text = 'Buy CD';
+				}
+				
+				if ($row['player-image']) {
+					if ($row['player-link']) {
+						$output .= '<a href="' . $row['player-link'] . '"><img style="height: 50px; width: 50px " src="' . $row['player-image']. '" /><br>' . $link_text . '</a>'; // link to album
+					}
+					else {
+						$output .= '<img style="height: 50px; width: 50px "  src="' . $row['player-image']. '" /><br>' . $link_text;
+					}
+				}
+				else {
+					if ($row['player-link']) {
+						$output .= '<a href="' . $row['player-link'] . '">' . $link_text . '</a>'; // link to album
+					}
+					else {
+						$output .= $link_text; 
+					}
+				}
 				$output .= '</td>';
 
 				if ($rankings_count > 1 AND $show_composite AND !$target_user AND $composite_position == 'left') {

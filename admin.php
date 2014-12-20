@@ -386,7 +386,22 @@ function wp_ranker_players_custom_box( $post ) {
   echo '<ul id="sortable">';
   $i = 0;
   if (!empty($players[0])) foreach ($players[0] as $player) {
-    echo '<li><input type="hidden" name="wp_ranker_players[' . $i . '][id]" value="'.esc_attr($player['id']).'" /><input type="text" placeholder="' . __( 'Default Rank', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][default_rank]" value="'.esc_attr($player['default_rank']).'" size="5" /> <input type="text" placeholder="' . __( 'Song title', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][name]" value="'.esc_attr($player['name']).'" size="25" /> <input type="text" placeholder="' . __( 'Artist', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][team]" value="'.esc_attr($player['team']).'" size="25" />  <input type="text" placeholder="' . __( 'Album', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][position]" value="'.esc_attr($player['position']).'" size="25" /> <span class="button remove">' . __( 'Remove', 'wp-ranking' ) . '</span> <span class="drag-icon"></span></li>';
+    $inputs = '<li><input type="hidden" name="wp_ranker_players[' . $i . '][id]" value="'.esc_attr($player['id']).'" />';
+	
+	if ($player['image']) {
+		$inputs .= '<img style="height: 50px; width: 50px " src="' . $player['image']. '" />';
+	}
+
+	$inputs .= '<input type="text" placeholder="' . __( 'Default Rank', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][default_rank]" value="'.esc_attr($player['default_rank']).'" size="5" /> '
+		.'<input type="text" placeholder="' . __( 'Song title', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][name]" value="'.esc_attr($player['name']).'" size="15" /> '
+		.'<input type="text" placeholder="' . __( 'Artist', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][team]" value="'.esc_attr($player['team']).'" size="15" />'
+		.'<input type="text" placeholder="' . __( 'Album', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][position]" value="'.esc_attr($player['position']).'" size="15" /> '
+		.'<input type="text" placeholder="' . __( 'Link to album', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][link]" value="'.esc_attr($player['link']).'" size="10" />';
+	
+	$inputs .= '<br><input type="text" placeholder="' . __( 'Link to image', 'wp-ranking' ) . '" name="wp_ranker_players[' . $i . '][image]" value="'.esc_attr($player['image']).'" size="30" /> '
+		.'<span class="button remove">' . __( 'Remove', 'wp-ranking' ) . '</span> <span class="drag-icon"></span></li>';
+	
+	echo $inputs;
     $i++;
   }
   echo '</ul>';
@@ -400,7 +415,7 @@ function wp_ranker_players_custom_box( $post ) {
     jQuery( "#sortable" ).sortable({ handle: ".drag-icon" });
     jQuery('.add').live('click', function() {
         var rand = Math.floor((Math.random()*999999)+1);
-        jQuery( "#sortable" ).append('<li><input type="hidden" name="wp_ranker_players[' + rand + '][id]" value="' + rand + '" /><input type="text" placeholder="<?php _e( 'Default Rank', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][default_rank]" value="" size="5" /> <input type="text" placeholder="<?php _e( 'Song title', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][name]" value="" size="25" /> <input type="text" placeholder="<?php _e( 'Artist', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][team]" value="" size="25" />  <input type="text" placeholder="<?php _e( 'Album', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][position]" value="" size="25" /> <span class="button remove"><?php _e( 'Remove', 'wp-ranking' ); ?></span> <span class="drag-icon"></span></li>');
+        jQuery( "#sortable" ).append('<li><input type="hidden" name="wp_ranker_players[' + rand + '][id]" value="' + rand + '" /><input type="text" placeholder="<?php _e( 'Default Rank', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][default_rank]" value="" size="5" /> <input type="text" placeholder="<?php _e( 'Song title', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][name]" value="" size="15" /> <input type="text" placeholder="<?php _e( 'Artist', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][team]" value="" size="15" />  <input type="text" placeholder="<?php _e( 'Album', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][position]" value="" size="15" /> <input type="text" placeholder="<?php _e( 'Link to album', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][link]" value="" size="10" /> <input type="text" placeholder="<?php _e( 'Link to image', 'wp-ranking' ); ?>" name="wp_ranker_players[' + rand + '][image]" value="" size="10" /> <span class="button remove"><?php _e( 'Remove', 'wp-ranking' ); ?></span> <span class="drag-icon"></span></li>');
      });
     jQuery('.remove').live('click', function() {
        jQuery(this).parent().remove();
