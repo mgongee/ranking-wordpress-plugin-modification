@@ -176,7 +176,7 @@ function ranker_shortcode( $atts ) {
 	echo '<table id="ranker' . $rankers_counter . '" class="rankings">';
 	echo '<thead>';
 	echo '<tr>';
-	echo '<th colspan="3"></th>';
+	echo '<th>Song</th><th>Artist</th><th>Album</th>';
 
 	
 	if ($rankings_count > 1 AND $composite_position == 'left' AND $show_composite AND !$target_user) {
@@ -248,39 +248,14 @@ function ranker_shortcode( $atts ) {
 			if ($row['votes'] > 0) {
 	 			$output = '<tr class="' . $class . '" id="player' . $row['player-id'] . '">';
 				$output .= '<td class="player">';
-				$output .= $row['player-name']; // name
+				$output .= $row['player-position']; // Song name
 				$output .= '</td>';
 				$output .= '<td class="player">';
-				$output .= $row['player-team']; // team
+				$output .= $row['player-name']; // artist name
 				$output .= '</td>';
-				$output .= '<td class="player">';
+				$output .= '<td class="player">'; // Album
+				$output .= '<a href="' . $row['player-link'] . '">' . $row['player-team'] . '</a>'; // link to album
 				
-				if ($row['player-position']) {
-					$link_text = $row['player-position'];
-				}
-				else {
-					if ($row['player-link']) {
-						$link_text = 'Buy CD';
-					}
-					else $link_text = '';
-				}
-				
-				if ($row['player-image']) {
-					if ($row['player-link']) {
-						$output .= '<a href="' . $row['player-link'] . '"><img class="ranking-cover" src="' . $row['player-image']. '" /><br>' . $link_text . '</a>'; // link to album
-					}
-					else {
-						$output .= '<img class="ranking-cover"  src="' . $row['player-image']. '" /><br>' . $link_text;
-					}
-				}
-				else {
-					if ($row['player-link']) {
-						$output .= '<a href="' . $row['player-link'] . '">' . $link_text . '</a>'; // link to album
-					}
-					else {
-						$output .= $link_text; 
-					}
-				}
 				$output .= '</td>';
 
 				if ($rankings_count > 1 AND $show_composite AND !$target_user AND $composite_position == 'left') {
@@ -293,6 +268,9 @@ function ranker_shortcode( $atts ) {
 				if ($target_user) {
 
 					$output .= '<td>';
+					if ($row['player-image']) {
+						$output .= '<img class="ranking-cover" src="' . $row['player-image']. '" /><br>';
+					}
 					$output .= $row['positions'][$target_user];
 					$output .= '</td>';
 					$counter++;	
@@ -300,6 +278,9 @@ function ranker_shortcode( $atts ) {
 				else {
 					if ($current_user != 0 AND isset($rankings[$current_user])) {
 						$output .= '<td class="position">';
+						if ($row['player-image']) {
+							$output .= '<img class="ranking-cover" src="' . $row['player-image']. '" /><br>';
+						}
 						$output .= $row['positions'][$current_user];
 						$output .= '</td>';
 						$counter++;
@@ -383,7 +364,7 @@ function show_author_thumbnail($user_id, $user_ranking_time) {
 	echo '<th class="author" title="' . __( 'Click to sort by this author', 'wp-ranking' ) . '">';
 	if (get_option( 'show-avatars' )) echo get_avatar( $user_id, 60 );
 	$user_info = get_userdata($user_id);
-	$timestamp = date("M d, H:i", $user_ranking_time);
+	$timestamp = date("M d", $user_ranking_time);
 	echo '<br>';
 	echo '<span class="ranked-user">' . $user_info->display_name . '</span>';
 	echo '<br>';
